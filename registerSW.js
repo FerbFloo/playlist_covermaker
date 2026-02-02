@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/playlist_covermaker/sw.js', { scope: '/playlist_covermaker/' })})}
