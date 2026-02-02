@@ -17,6 +17,7 @@ export async function processImage(imageSrc, options) {
         invert = false,
         width = 1080,
         height = 1080,
+        effectConfigs = {},
     } = options;
 
     // 1. Pre-load Font
@@ -44,7 +45,7 @@ export async function processImage(imageSrc, options) {
 
                 // --- LAYER 2: Text ---
                 if (title) {
-                    drawTextLayer(ctx, title, { width, height, font, textSize, color, textX, textY, textEffect });
+                    drawTextLayer(ctx, title, { width, height, font, textSize, color, textX, textY, textEffect, effectConfigs });
                 }
 
                 resolve(canvas.toDataURL('image/jpeg', 0.9));
