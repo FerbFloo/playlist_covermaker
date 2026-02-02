@@ -218,19 +218,6 @@ function drawTextLayer(ctx, title, { width, height, font, textSize, color, textX
             ctx.fillText(title, 0, 0);
             break;
 
-        case 'glitch':
-            // Chromatic Aberration / Glitch Effect
-            const glitchOffset = baseSize * 0.02;
-            ctx.globalCompositeOperation = 'screen';
-            ctx.fillStyle = '#00ffff';
-            ctx.fillText(title, -glitchOffset, 0);
-            ctx.fillStyle = '#ff0000';
-            ctx.fillText(title, glitchOffset, 0);
-            ctx.globalCompositeOperation = 'source-over';
-            ctx.fillStyle = '#ffffff';
-            ctx.fillText(title, 0, 0);
-            break;
-
         case 'echo':
             // Echo / Motion Blur Effect
             const echoSteps = 6;
@@ -239,26 +226,6 @@ function drawTextLayer(ctx, title, { width, height, font, textSize, color, textX
                 ctx.fillStyle = `${color}${Math.floor((1 - i / echoSteps) * 40).toString(16).padStart(2, '0')}`;
                 ctx.fillText(title, i * echoOffset, i * echoOffset);
             }
-            ctx.fillStyle = '#ffffff';
-            ctx.fillText(title, 0, 0);
-            break;
-
-        case 'glass':
-            // Glassmorphism effect
-            const metrics = ctx.measureText(title);
-            const padX = baseSize * 0.4;
-            const padY = baseSize * 0.2;
-            ctx.save();
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
-            ctx.shadowBlur = 20;
-            ctx.beginPath();
-            ctx.roundRect(-metrics.width / 2 - padX, -baseSize / 2 - padY, metrics.width + padX * 2, baseSize + padY * 2, 20);
-            ctx.fill();
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            ctx.restore();
             ctx.fillStyle = '#ffffff';
             ctx.fillText(title, 0, 0);
             break;
