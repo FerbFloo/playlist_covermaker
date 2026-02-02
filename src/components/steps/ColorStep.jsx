@@ -1,14 +1,17 @@
-import { useState } from 'react';
+import { HexColorPicker } from 'react-colorful';
 
+// Modern, curated presets
 const PRESETS = [
     '#1DB954', // Spotify Green
-    '#FF0055', // Hot Pink
-    '#0099FF', // Electric Blue
-    '#FF5500', // Sunset Orange
-    '#9D00FF', // Deep Purple
-    '#FFFF00', // Electric Yellow
-    '#000000', // Pitch Black
-    '#FFFFFF', // White
+    '#FF6B6B', // Vibrant Red
+    '#4ECDC4', // Teal
+    '#FFE66D', // Bright Yellow
+    '#FF0055', // Neon Pink
+    '#0055FF', // Electric Blue
+    '#7F00FF', // Violet
+    '#FF9F1C', // Orange
+    '#F7F7F7', // White-ish
+    '#111111', // Black-ish
 ];
 
 export default function ColorStep({ color, onChange, onNext, onPrev }) {
@@ -17,117 +20,196 @@ export default function ColorStep({ color, onChange, onNext, onPrev }) {
             flex: 1,
             display: 'flex',
             flexDirection: 'column',
-            padding: '2rem',
-            backgroundColor: color, /* Live preview background */
-            transition: 'background-color 0.3s ease',
-            color: getContrastColor(color)
+            alignItems: 'center',
+            height: '100dvh',
+            overflow: 'hidden',
+            background: '#fafafa'
         }}>
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', maxWidth: '400px', margin: '0 auto', width: '100%' }}>
-                <h2 style={{ textAlign: 'center', marginBottom: '2rem', fontWeight: 800, fontSize: '2rem' }}>Pick a Vibe</h2>
+            {/* Header */}
+            <div style={{
+                width: '100%',
+                padding: '2rem 1.5rem 1rem',
+                textAlign: 'center'
+            }}>
+                <h2 style={{
+                    fontSize: '2rem',
+                    fontWeight: 900,
+                    margin: 0
+                }}>
+                    Choose a Vibe
+                </h2>
+            </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
-                    {PRESETS.map((preset) => (
-                        <button
-                            key={preset}
-                            onClick={() => onChange(preset)}
-                            style={{
-                                backgroundColor: preset,
-                                width: '100%',
-                                aspectRatio: '1',
-                                borderRadius: '50%',
-                                border: color === preset ? `4px solid ${getContrastColor(color)}` : '2px solid rgba(0,0,0,0.1)',
-                                cursor: 'pointer',
-                                transform: color === preset ? 'scale(1.1)' : 'scale(1)',
-                                transition: 'transform 0.2s'
-                            }}
-                            aria-label={`Select color ${preset}`}
-                        />
-                    ))}
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '2rem' }}>
-                    <label htmlFor="custom-color" style={{ fontSize: '0.9rem', fontWeight: 500, opacity: 0.8 }}>Custom Color</label>
-                    <div style={{ display: 'flex', gap: '1rem' }}>
-                        <input
-                            id="custom-color"
-                            type="color"
-                            value={color}
-                            onChange={(e) => onChange(e.target.value)}
-                            style={{
-                                border: 'none',
-                                height: '50px',
-                                width: '50px',
-                                borderRadius: '12px',
-                                cursor: 'pointer',
-                                background: 'none'
-                            }}
-                        />
-                        <input
-                            type="text"
-                            value={color}
-                            onChange={(e) => onChange(e.target.value)}
-                            style={{
-                                flex: 1,
-                                padding: '1rem',
-                                borderRadius: '12px',
-                                border: 'none',
-                                background: 'rgba(255,255,255,0.2)',
-                                color: 'currentColor',
-                                backdropFilter: 'blur(10px)',
-                                fontWeight: 'bold',
-                                textTransform: 'uppercase'
-                            }}
+            {/* Scrollable Content */}
+            <div style={{
+                flex: 1,
+                width: '100%',
+                maxWidth: '500px',
+                overflowY: 'auto',
+                padding: '0 1.5rem 1.5rem',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '2rem',
+                alignItems: 'center'
+            }}>
+                {/* Color Wheel */}
+                <div style={{
+                    width: '100%',
+                    maxWidth: '300px'
+                }}>
+                    <div className="custom-color-picker">
+                        <HexColorPicker
+                            color={color}
+                            onChange={onChange}
                         />
                     </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '1rem', marginTop: 'auto' }}>
-                    <button
-                        type="button"
-                        onClick={onPrev}
-                        style={{
-                            flex: 1,
-                            background: 'rgba(255,255,255,0.2)',
-                            color: 'currentColor',
-                            padding: '1rem',
-                            borderRadius: '50px',
-                            fontSize: '1rem',
-                            fontWeight: '600',
-                            backdropFilter: 'blur(10px)'
-                        }}
-                    >
-                        Back
-                    </button>
-                    <button
-                        type="button"
-                        onClick={onNext}
-                        style={{
-                            flex: 1,
-                            background: getContrastColor(color),
-                            color: color,
-                            padding: '1rem',
-                            borderRadius: '50px',
-                            fontSize: '1rem',
-                            fontWeight: '600',
-                            border: '2px solid transparent'
-                        }}
-                    >
-                        Next
-                    </button>
+                {/* Color Display */}
+                <div style={{
+                    background: 'white',
+                    padding: '1rem 1.5rem',
+                    borderRadius: '16px',
+                    fontFamily: 'monospace',
+                    fontWeight: 'bold',
+                    fontSize: '1.1rem',
+                    letterSpacing: '1px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.75rem',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+                }}>
+                    <span style={{
+                        width: '24px',
+                        height: '24px',
+                        background: color,
+                        borderRadius: '6px',
+                        border: '2px solid rgba(0,0,0,0.1)',
+                        flexShrink: 0
+                    }} />
+                    {color.toUpperCase()}
+                </div>
+
+                {/* Presets */}
+                <div style={{ width: '100%' }}>
+                    <label style={{
+                        display: 'block',
+                        fontWeight: 600,
+                        fontSize: '0.9rem',
+                        color: '#666',
+                        marginBottom: '1rem',
+                        textAlign: 'center'
+                    }}>
+                        Quick Picks
+                    </label>
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(5, 1fr)',
+                        gap: '1rem',
+                        justifyItems: 'center'
+                    }}>
+                        {PRESETS.map(preset => (
+                            <button
+                                key={preset}
+                                onClick={() => onChange(preset)}
+                                style={{
+                                    width: '48px',
+                                    height: '48px',
+                                    borderRadius: '12px',
+                                    background: preset,
+                                    border: color.toLowerCase() === preset.toLowerCase()
+                                        ? '3px solid #000'
+                                        : '2px solid rgba(0,0,0,0.1)',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s ease',
+                                    transform: color.toLowerCase() === preset.toLowerCase()
+                                        ? 'scale(1.1)'
+                                        : 'scale(1)',
+                                    boxShadow: color.toLowerCase() === preset.toLowerCase()
+                                        ? '0 4px 12px rgba(0,0,0,0.2)'
+                                        : '0 2px 4px rgba(0,0,0,0.1)'
+                                }}
+                                aria-label={`Select color ${preset}`}
+                            />
+                        ))}
+                    </div>
                 </div>
             </div>
+
+            {/* Navigation - Fixed Bottom */}
+            <div style={{
+                width: '100%',
+                padding: '1.5rem',
+                background: 'white',
+                borderTop: '1px solid #eee',
+                display: 'flex',
+                gap: '1rem',
+                maxWidth: '600px',
+                boxShadow: '0 -2px 10px rgba(0,0,0,0.05)'
+            }}>
+                <button
+                    onClick={onPrev}
+                    style={{
+                        flex: 1,
+                        padding: '1rem',
+                        borderRadius: '50px',
+                        border: 'none',
+                        background: '#f0f0f0',
+                        fontSize: '1rem',
+                        fontWeight: '600',
+                        color: '#333',
+                        cursor: 'pointer'
+                    }}
+                >
+                    Back
+                </button>
+                <button
+                    onClick={onNext}
+                    style={{
+                        flex: 2,
+                        padding: '1rem',
+                        borderRadius: '50px',
+                        border: 'none',
+                        background: color,
+                        fontSize: '1rem',
+                        fontWeight: '600',
+                        color: '#fff',
+                        cursor: 'pointer',
+                        boxShadow: `0 4px 12px ${color}40`
+                    }}
+                >
+                    Continue
+                </button>
+            </div>
+
+            <style>{`
+                .custom-color-picker .react-colorful {
+                    width: 100%;
+                    height: 280px;
+                    border-radius: 20px;
+                    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+                }
+                .custom-color-picker .react-colorful__saturation {
+                    border-radius: 20px 20px 0 0;
+                    border-bottom: none;
+                }
+                .custom-color-picker .react-colorful__hue {
+                    height: 40px;
+                    border-radius: 0 0 20px 20px;
+                    margin-top: 0;
+                }
+                .custom-color-picker .react-colorful__pointer {
+                    width: 28px;
+                    height: 28px;
+                    border: 3px solid white;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                }
+                .custom-color-picker .react-colorful__hue-pointer {
+                    width: 28px;
+                    height: 28px;
+                    border-radius: 50%;
+                }
+            `}</style>
         </div>
     );
-}
-
-// Helper to determine text color (black or white) based on background brightness
-function getContrastColor(hex) {
-    if (!hex) return '#000000';
-    // Convert hex to RGB
-    const r = parseInt(hex.substr(1, 2), 16);
-    const g = parseInt(hex.substr(3, 2), 16);
-    const b = parseInt(hex.substr(5, 2), 16);
-    // Calculate luminance
-    const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-    return (yiq >= 128) ? '#000000' : '#FFFFFF';
 }

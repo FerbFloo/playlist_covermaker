@@ -1,16 +1,44 @@
-# React + Vite
+# Playlist Cover Generator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> **⚠️ DISCLAIMER: VIBE CODED SLOP**  
+> This project is "vibe coded slop". It is a purely personal project created for the aesthetics and the fun of it. It is **not** intended to be used, maintained, or supported for others. I built this for me. If it breaks, it breaks.
 
-Currently, two official plugins are available:
+A mobile-first Progressive Web App (PWA) for generating stylized, halftone-duotone Spotify playlist covers.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+[**Live Demo**](https://ferbfloo.github.io/playlist_covermaker/)
 
-## React Compiler
+## ✨ Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Wizard Workflow**: A step-by-step process (Title -> Color -> Image -> Edit) to keep things simple.
+- **Halftone Engine**: Custom Canvas-based processing that converts images into a stylish duotone dot pattern.
+- **Advanced Text Editor**:
+  - Live text editing.
+  - Variable font sizing and custom fonts (Bogart, Heavitas, etc.).
+  - Alignment controls (Center, Bottom Left, etc.).
+  - All-Caps toggle.
+- **Image Tools**:
+  - **Cropping**: Zoom and pan to get the perfect 1:1 square.
+  - **Adjustments**: Brightness, Contrast, and Black/White Levels.
+  - **Color**: Professional color wheel with "Vibe" presets.
+- **PWA Ready**: Installable on iOS and Android for a native-like experience.
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **React** + **Vite**
+- **react-easy-crop** (Image manipulation)
+- **react-colorful** (Color selection)
+- **Canvas API** (Image processing)
+
+## 🏃‍♂️ Running Locally
+
+If you really want to run this slop locally:
+
+1. Clone the repo.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Run the dev server:
+   ```bash
+   npm run dev
+   ```

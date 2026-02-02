@@ -1,137 +1,221 @@
-import { useRef, useState } from 'react';
+import { useState, useCallback } from 'react';
+import Cropper from 'react-easy-crop';
+import { getCroppedImg } from '../../lib/cropUtils';
 
-export default function ImageStep({ image, onChange, onNext, onPrev }) {
-    const fileInputRef = useRef(null);
-    const [dragActive, setDragActive] = useState(false);
+export default function ImageStep({ image, KW, onChange, onNext, onPrev }) {
+    const [isDragging, setIsDragging] = useState(false);
+
+    // Crop State
+    const [tempImage, setTempImage] = useState(null); // The raw uploaded image
+    const [crop, setCrop] = useState({ x: 0, y: 0 });
+    const [zoom, setZoom] = useState(1);
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+
+    const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
+        setCroppedAreaPixels(croppedAreaPixels);
+    }, []);
+
+    const processCrop = async () => {
+        try {
+            const croppedImage = await getCroppedImg(tempImage, croppedAreaPixels);
+            onChange(croppedImage); // Save final cropped image
+            onNext(); // Move to next step
+        } catch (e) {
+            console.error(e);
+        }
+    };
 
     const handleFile = (file) => {
         if (file && file.type.startsWith('image/')) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                onChange(e.target.result); // Pass base64 string
+                setTempImage(e.target.result);
+                setZoom(1);
+                setCrop({ x: 0, y: 0 });
             };
             reader.readAsDataURL(file);
         }
     };
 
-    const handleChange = (e) => {
+    const onDrop = (e) => {
         e.preventDefault();
-        if (e.target.files && e.target.files[0]) {
-            handleFile(e.target.files[0]);
-        }
-    };
-
-    const handleDrag = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (e.type === 'dragenter' || e.type === 'dragover') {
-            setDragActive(true);
-        } else if (e.type === 'dragleave') {
-            setDragActive(false);
-        }
-    };
-
-    const handleDrop = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setDragActive(false);
+        setIsDragging(false);
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
             handleFile(e.dataTransfer.files[0]);
         }
     };
 
+    const handleFileInput = (e) => {
+        if (e.target.files && e.target.files[0]) {
+            handleFile(e.target.files[0]);
+        }
+    };
+
+    // If we have a tempImage, we show the Cropper
+    if (tempImage) {
+        return (
+            <div className="step-container" style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%',
+                overflow: 'hidden',
+                position: 'relative'
+            }}>
+                <div style={{ flex: 1, position: 'relative', background: '#333' }}>
+                    <Cropper
+                        image={tempImage}
+                        crop={crop}
+                        zoom={zoom}
+                        aspect={1}
+                        onCropChange={setCrop}
+                        onCropComplete={onCropComplete}
+                        onZoomChange={setZoom}
+                        showGrid={false}
+                    />
+                </div>
+
+                <div style={{
+                    padding: '1.5rem',
+                    background: 'white',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '1rem',
+                    zIndex: 10
+                }}>
+                    <div>
+                        <label style={{ fontWeight: 600, color: '#333', fontSize: '0.9rem' }}>Zoom</label>
+                        <input
+                            type="range"
+                            value={zoom}
+                            min={1}
+                            max={3}
+                            step={0.1}
+                            aria-labelledby="Zoom"
+                            onChange={(e) => setZoom(Number(e.target.value))}
+                            style={{ width: '100%', accentColor: 'black' }}
+                        />
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '1rem' }}>
+                        <button
+                            onClick={() => setTempImage(null)}
+                            style={{
+                                flex: 1,
+                                padding: '1rem',
+                                borderRadius: '50px',
+                                background: '#f0f0f0',
+                                color: '#333',
+                                fontWeight: 'bold'
+                            }}
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={processCrop}
+                            style={{
+                                flex: 2,
+                                padding: '1rem',
+                                borderRadius: '50px',
+                                background: '#000',
+                                color: 'white',
+                                fontWeight: 'bold'
+                            }}
+                        >
+                            Use Photo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Default Upload View
     return (
         <div className="step-container" style={{
             flex: 1,
             display: 'flex',
             flexDirection: 'column',
-            padding: '2rem',
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            padding: '2rem',
+            height: '100%'
         }}>
-            <div style={{ width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                <h2 style={{ textAlign: 'center', fontWeight: 800, fontSize: '2rem' }}>Select a Photo</h2>
+            <h2 style={{ fontSize: '2rem', fontWeight: 900, marginBottom: '2rem' }}>Pick a Photo</h2>
 
-                <div
-                    className="upload-area"
-                    onDragEnter={handleDrag}
-                    onDragLeave={handleDrag}
-                    onDragOver={handleDrag}
-                    onDrop={handleDrop}
-                    onClick={() => fileInputRef.current.click()}
+            <div
+                style={{
+                    width: '100%',
+                    maxWidth: '400px',
+                    aspectRatio: '1',
+                    borderRadius: '24px',
+                    border: '3px dashed #ddd',
+                    background: isDragging ? '#f0f0f0' : '#fafafa',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    position: 'relative',
+                    overflow: 'hidden'
+                }}
+                onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                onDragLeave={() => setIsDragging(false)}
+                onDrop={onDrop}
+                onClick={() => document.getElementById('file-upload').click()}
+            >
+                {image ? (
+                    <img
+                        src={image}
+                        alt="Preview"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                ) : (
+                    <>
+                        <span style={{ fontSize: '3rem', marginBottom: '1rem' }}>📷</span>
+                        <p style={{ fontWeight: 600, color: '#888' }}>Tap to upload</p>
+                    </>
+                )}
+
+                <input
+                    id="file-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileInput}
+                    style={{ display: 'none' }}
+                />
+            </div>
+
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem', width: '100%', maxWidth: '400px' }}>
+                <button
+                    onClick={onPrev}
                     style={{
-                        width: '100%',
-                        aspectRatio: '1',
-                        borderRadius: '24px',
-                        border: `2px dashed ${dragActive ? 'var(--primary-color)' : 'rgba(0,0,0,0.2)'}`,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer',
-                        backgroundColor: dragActive ? 'rgba(0,0,0,0.05)' : 'transparent',
-                        position: 'relative',
-                        overflow: 'hidden',
-                        transition: 'all 0.2s ease'
+                        flex: 1,
+                        padding: '1rem',
+                        borderRadius: '50px',
+                        fontWeight: 'bold',
+                        background: '#f0f0f0',
+                        color: '#333'
                     }}
                 >
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={handleChange}
-                        style={{ display: 'none' }}
-                    />
-
-                    {image ? (
-                        <img
-                            src={image}
-                            alt="Preview"
-                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                        />
-                    ) : (
-                        <>
-                            <span style={{ fontSize: '3rem', opacity: 0.5, marginBottom: '1rem' }}>📷</span>
-                            <p style={{ fontWeight: 600, opacity: 0.6 }}>Tap to upload</p>
-                        </>
-                    )}
-                </div>
-
-                <div style={{ display: 'flex', gap: '1rem', marginTop: 'auto' }}>
+                    Back
+                </button>
+                {image && (
                     <button
-                        type="button"
-                        onClick={onPrev}
-                        style={{
-                            flex: 1,
-                            background: 'rgba(0,0,0,0.05)',
-                            color: 'var(--primary-color)',
-                            padding: '1rem',
-                            borderRadius: '50px',
-                            fontSize: '1rem',
-                            fontWeight: '600'
-                        }}
-                    >
-                        Back
-                    </button>
-                    <button
-                        type="button"
                         onClick={onNext}
-                        disabled={!image}
                         style={{
                             flex: 1,
-                            background: 'var(--primary-color)',
-                            color: 'var(--secondary-color)',
                             padding: '1rem',
                             borderRadius: '50px',
-                            fontSize: '1rem',
-                            fontWeight: '600',
-                            opacity: image ? 1 : 0.5,
-                            transition: 'opacity 0.2s'
+                            fontWeight: 'bold',
+                            background: '#000',
+                            color: 'white'
                         }}
                     >
-                        Create
+                        Skip
                     </button>
-                </div>
+                )}
             </div>
         </div>
     );
