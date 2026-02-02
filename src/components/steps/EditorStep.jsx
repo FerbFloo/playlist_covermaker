@@ -14,8 +14,13 @@ const TEXT_EFFECTS = [
     { id: 'metallic', label: 'Metallic', icon: '🪙' },
     { id: 'neon', label: 'Neon', icon: '💡' },
     { id: 'shadow', label: 'Shadow', icon: '🌑' },
-    { id: 'outline', label: 'Outline', icon: '⭕' },
     { id: 'retro3d', label: '3D', icon: '📐' },
+    { id: 'glitch', label: 'Glitch', icon: '📺' },
+    { id: 'echo', label: 'Echo', icon: '🌊' },
+    { id: 'glass', label: 'Glass', icon: '🪟' },
+    { id: 'glow', label: 'Glow', icon: '🌟' },
+    { id: 'gradient', label: 'Grad', icon: '🌈' },
+    { id: 'outline', label: 'Outline', icon: '⭕' },
 ];
 
 export default function EditorStep({ data, updateOption, updateTitle, onPrev }) {

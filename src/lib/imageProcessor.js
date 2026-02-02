@@ -181,67 +181,27 @@ function drawTextLayer(ctx, title, { width, height, font, textSize, color, textX
             break;
 
         case 'metallic':
-            // 3D INFLATED Metallic Bevel Effect - Puffy, raised appearance
-
-            // Step 1: Outer glow (creates inflation/puffiness around edges)
+            // 3D Metallic Effect
             ctx.shadowColor = 'rgba(255, 255, 255, 0.4)';
             ctx.shadowBlur = baseSize * 0.15;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 0;
             ctx.fillStyle = '#ffffff';
             ctx.fillText(title, 0, 0);
-
-            // Step 2: Deep inner shadow (creates depth inside letters)
             ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
-            ctx.shadowBlur = baseSize * 0.15;
             ctx.shadowOffsetX = baseSize * 0.04;
             ctx.shadowOffsetY = baseSize * 0.04;
             ctx.fillStyle = '#1a1a1a';
             ctx.fillText(title, 0, 0);
-
-            // Step 3: Medium shadow layer (more depth)
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-            ctx.shadowBlur = baseSize * 0.1;
-            ctx.shadowOffsetX = baseSize * 0.025;
-            ctx.shadowOffsetY = baseSize * 0.025;
-            ctx.fillStyle = '#3a3a3a';
-            ctx.fillText(title, 0, 0);
-
-            // Clear shadows
             ctx.shadowColor = 'transparent';
-            ctx.shadowBlur = 0;
             ctx.shadowOffsetX = 0;
             ctx.shadowOffsetY = 0;
-
-            // Step 4: Main metallic gradient (brighter for inflation)
             const metalGradient = ctx.createLinearGradient(0, -baseSize / 1.8, 0, baseSize / 1.8);
-            metalGradient.addColorStop(0, '#c8c8c8');    // Lighter top
-            metalGradient.addColorStop(0.25, '#f0f0f0'); // Very bright upper
-            metalGradient.addColorStop(0.45, '#ffffff'); // Peak shine
-            metalGradient.addColorStop(0.65, '#e0e0e0'); // Bright lower
-            metalGradient.addColorStop(1, '#a0a0a0');    // Medium bottom
-
+            metalGradient.addColorStop(0, '#c8c8c8');
+            metalGradient.addColorStop(0.25, '#f0f0f0');
+            metalGradient.addColorStop(0.45, '#ffffff');
+            metalGradient.addColorStop(0.65, '#e0e0e0');
+            metalGradient.addColorStop(1, '#a0a0a0');
             ctx.fillStyle = metalGradient;
             ctx.fillText(title, 0, 0);
-
-            // Step 5: Strong top highlight (inflated look)
-            ctx.globalCompositeOperation = 'overlay';
-            const highlightGradient = ctx.createLinearGradient(0, -baseSize / 2, 0, baseSize / 5);
-            highlightGradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
-            highlightGradient.addColorStop(0.6, 'rgba(255, 255, 255, 0.5)');
-            highlightGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-            ctx.fillStyle = highlightGradient;
-            ctx.fillText(title, 0, 0);
-
-            // Step 6: Bottom shadow edge (stronger bevel)
-            const shadowGradient = ctx.createLinearGradient(0, -baseSize / 5, 0, baseSize / 1.8);
-            shadowGradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
-            shadowGradient.addColorStop(0.5, 'rgba(0, 0, 0, 0.2)');
-            shadowGradient.addColorStop(1, 'rgba(0, 0, 0, 0.4)');
-            ctx.fillStyle = shadowGradient;
-            ctx.fillText(title, 0, 0);
-
-            ctx.globalCompositeOperation = 'source-over';
             break;
 
         case 'neon':
@@ -251,12 +211,65 @@ function drawTextLayer(ctx, title, { width, height, font, textSize, color, textX
             ctx.lineWidth = baseSize * 0.03;
             ctx.strokeStyle = color;
             ctx.strokeText(title, 0, 0);
-
             ctx.shadowBlur = baseSize * 0.3;
             ctx.strokeText(title, 0, 0);
-
             ctx.shadowBlur = 0;
             ctx.fillStyle = '#FFFFFF';
+            ctx.fillText(title, 0, 0);
+            break;
+
+        case 'glitch':
+            // Chromatic Aberration / Glitch Effect
+            const glitchOffset = baseSize * 0.02;
+            ctx.globalCompositeOperation = 'screen';
+            ctx.fillStyle = '#00ffff';
+            ctx.fillText(title, -glitchOffset, 0);
+            ctx.fillStyle = '#ff0000';
+            ctx.fillText(title, glitchOffset, 0);
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(title, 0, 0);
+            break;
+
+        case 'echo':
+            // Echo / Motion Blur Effect
+            const echoSteps = 6;
+            const echoOffset = baseSize * 0.015;
+            for (let i = echoSteps; i > 0; i--) {
+                ctx.fillStyle = `${color}${Math.floor((1 - i / echoSteps) * 40).toString(16).padStart(2, '0')}`;
+                ctx.fillText(title, i * echoOffset, i * echoOffset);
+            }
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(title, 0, 0);
+            break;
+
+        case 'glass':
+            // Glassmorphism effect
+            const metrics = ctx.measureText(title);
+            const padX = baseSize * 0.4;
+            const padY = baseSize * 0.2;
+            ctx.save();
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
+            ctx.shadowBlur = 20;
+            ctx.beginPath();
+            ctx.roundRect(-metrics.width / 2 - padX, -baseSize / 2 - padY, metrics.width + padX * 2, baseSize + padY * 2, 20);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.restore();
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(title, 0, 0);
+            break;
+
+        case 'glow':
+            // Soft Aura/Glow effect
+            ctx.shadowColor = color;
+            ctx.shadowBlur = baseSize * 0.4;
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(title, 0, 0);
+            ctx.shadowBlur = baseSize * 0.1;
             ctx.fillText(title, 0, 0);
             break;
 
@@ -265,18 +278,36 @@ function drawTextLayer(ctx, title, { width, height, font, textSize, color, textX
             const shadowOffset = baseSize * 0.05;
             ctx.fillStyle = 'rgba(0,0,0,0.5)';
             ctx.fillText(title, shadowOffset, shadowOffset);
-
             ctx.lineWidth = baseSize * 0.04;
             ctx.strokeStyle = '#FFFFFF';
             ctx.lineJoin = 'round';
             ctx.strokeText(title, 0, 0);
+            ctx.fillStyle = color;
+            ctx.fillText(title, 0, 0);
+            break;
 
+        case 'retro3d':
+            // Retro 3D layered effect
+            const offset3d = baseSize * 0.015;
+            const layers = 12;
+            ctx.shadowBlur = baseSize * 0.02;
+            for (let i = layers; i > 0; i--) {
+                const alpha = 0.25 - (i / layers) * 0.15;
+                ctx.fillStyle = `rgba(0,0,0,${alpha})`;
+                ctx.shadowColor = `rgba(0,0,0,${alpha * 0.5})`;
+                ctx.fillText(title, offset3d * i, offset3d * i);
+            }
+            ctx.shadowBlur = 0;
+            ctx.lineWidth = baseSize * 0.05;
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.lineJoin = 'round';
+            ctx.strokeText(title, 0, 0);
             ctx.fillStyle = color;
             ctx.fillText(title, 0, 0);
             break;
 
         case 'outline':
-            // Outline only - THINNER
+            // Outline only
             ctx.lineWidth = baseSize * 0.05;
             ctx.strokeStyle = color;
             ctx.lineJoin = 'round';
@@ -284,29 +315,12 @@ function drawTextLayer(ctx, title, { width, height, font, textSize, color, textX
             ctx.strokeText(title, 0, 0);
             break;
 
-        case 'retro3d':
-            // Retro 3D layered effect - PUFFIER with more layers and blur
-            const offset = baseSize * 0.015;
-            const layers = 12;
-
-            // Background layers with slight blur for softness
-            ctx.shadowBlur = baseSize * 0.02;
-            for (let i = layers; i > 0; i--) {
-                const alpha = 0.25 - (i / layers) * 0.15;
-                ctx.fillStyle = `rgba(0,0,0,${alpha})`;
-                ctx.shadowColor = `rgba(0,0,0,${alpha * 0.5})`;
-                ctx.fillText(title, offset * i, offset * i);
-            }
-            ctx.shadowBlur = 0;
-            ctx.shadowColor = 'transparent';
-
-            // Main text with outline
-            ctx.lineWidth = baseSize * 0.05;
-            ctx.strokeStyle = '#FFFFFF';
-            ctx.lineJoin = 'round';
-            ctx.strokeText(title, 0, 0);
-
-            ctx.fillStyle = color;
+        case 'gradient':
+            // Vertical Gradient effect
+            const grad = ctx.createLinearGradient(0, -baseSize / 2, 0, baseSize / 2);
+            grad.addColorStop(0, '#ffffff');
+            grad.addColorStop(1, color);
+            ctx.fillStyle = grad;
             ctx.fillText(title, 0, 0);
             break;
 
