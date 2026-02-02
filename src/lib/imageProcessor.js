@@ -283,12 +283,17 @@ function drawTextLayer(ctx, title, { width, height, font, textSize, color, textX
             break;
 
         case 'gradient':
-            // Vertical Gradient effect
+            // Solid color top, subtly lighter bottom
+            ctx.fillStyle = color;
+            ctx.fillText(title, 0, 0);
+
+            ctx.globalCompositeOperation = 'source-atop';
             const grad = ctx.createLinearGradient(0, -baseSize / 2, 0, baseSize / 2);
-            grad.addColorStop(0, '#ffffff');
-            grad.addColorStop(1, color);
+            grad.addColorStop(0, 'rgba(255, 255, 255, 0)');
+            grad.addColorStop(1, 'rgba(255, 255, 255, 0.35)');
             ctx.fillStyle = grad;
             ctx.fillText(title, 0, 0);
+            ctx.globalCompositeOperation = 'source-over';
             break;
 
         default:
