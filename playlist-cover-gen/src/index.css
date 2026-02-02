@@ -1,0 +1,63 @@
+@font-face {
+  font-family: 'Bogart';
+  src: url('/src/assets/fonts/Bogart-Bold-trial.ttf') format('truetype');
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: 'Cocogoose';
+  src: url('/src/assets/fonts/Cocogoose-Pro-Regular-trial.ttf') format('truetype');
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: 'Heavitas';
+  src: url('/src/assets/fonts/Heavitas.ttf') format('truetype');
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: 'Redband';
+  src: url('/src/assets/fonts/Redband-Regular.ttf') format('truetype');
+  font-weight: normal;
+}
+
+:root {
+  --primary-color: #000000;
+  --secondary-color: #ffffff;
+  --accent-color: #1DB954;
+  /* Spotify Greenish */
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  --spacing-unit: 8px;
+  --border-radius: 12px;
+  --canvas-size: 320px;
+  /* Preview size */
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  overscroll-behavior: none;
+  /* Prevent rubber-banding on iOS */
+}
+
+#root {
+  width: 100%;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+}
