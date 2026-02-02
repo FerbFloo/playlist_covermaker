@@ -694,25 +694,6 @@ export default function EditorStep({ data, updateOption, updateTitle, onPrev }) 
                             {/* Navigation Buttons */}
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.6rem' }}>
                                 <button
-                                    onClick={() => setActiveSubsection('effect')}
-                                    style={{
-                                        padding: '0.85rem 0.4rem',
-                                        borderRadius: '12px',
-                                        background: '#f0f0f0',
-                                        border: 'none',
-                                        cursor: 'pointer',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        gap: '0.5rem',
-                                        fontWeight: 'bold',
-                                        fontSize: '0.85rem'
-                                    }}
-                                >
-                                    <span style={{ fontSize: '1.5rem' }}>🎨</span>
-                                    <span>Effect</span>
-                                </button>
-                                <button
                                     onClick={() => setActiveSubsection('font')}
                                     style={{
                                         padding: '1rem 0.5rem',
@@ -749,6 +730,25 @@ export default function EditorStep({ data, updateOption, updateTitle, onPrev }) 
                                 >
                                     <span style={{ fontSize: '1.5rem' }}>📍</span>
                                     <span>Position</span>
+                                </button>
+                                <button
+                                    onClick={() => setActiveSubsection('effect')}
+                                    style={{
+                                        padding: '0.85rem 0.4rem',
+                                        borderRadius: '12px',
+                                        background: '#f0f0f0',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        gap: '0.5rem',
+                                        fontWeight: 'bold',
+                                        fontSize: '0.85rem'
+                                    }}
+                                >
+                                    <span style={{ fontSize: '1.5rem' }}>🎨</span>
+                                    <span>Effect</span>
                                 </button>
                             </div>
                         </div>
