@@ -290,7 +290,7 @@ function drawTextLayer(ctx, title, { width, height, font, textSize, color, textX
             ctx.globalCompositeOperation = 'source-atop';
             const grad = ctx.createLinearGradient(0, -baseSize / 2, 0, baseSize / 2);
             grad.addColorStop(0, 'rgba(255, 255, 255, 0)');
-            grad.addColorStop(1, 'rgba(255, 255, 255, 0.35)');
+            grad.addColorStop(1, 'rgba(255, 255, 255, 0.55)');
             ctx.fillStyle = grad;
             ctx.fillText(title, 0, 0);
             ctx.globalCompositeOperation = 'source-over';
