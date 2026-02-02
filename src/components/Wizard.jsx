@@ -24,6 +24,17 @@ export default function Wizard() {
             rotation: 0, // 0, 15, 45 degrees for halftone pattern
             textEffect: 'classic', // classic, metallic, neon, shadow, outline, retro3d
             invert: false, // invert color scheme (swap background and dots)
+            effectConfigs: {
+                classic: { thickness: 0.06 },
+                metallic: { intensity: 0.15 },
+                neon: { blur: 0.3, inner: 0.03 },
+                shadow: { offset: 0.05, blur: 0.02 },
+                retro3d: { layers: 12, offset: 0.015 },
+                echo: { steps: 6, offset: 0.015 },
+                glow: { radius: 0.4 },
+                gradient: { strength: 0.55 },
+                outline: { thickness: 0.05 }
+            }
         }
     });
 

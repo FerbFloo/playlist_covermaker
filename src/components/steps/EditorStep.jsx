@@ -25,7 +25,7 @@ export default function EditorStep({ data, updateOption, updateTitle, onPrev }) 
     const [previewUrl, setPreviewUrl] = useState(null);
     const [isProcessing, setIsProcessing] = useState(false);
     const [activeTab, setActiveTab] = useState('text'); // 'text' | 'image'
-    const [activeSubsection, setActiveSubsection] = useState(null); // 'effect' | 'font' | 'position' | null
+    const [activeSubsection, setActiveSubsection] = useState(null); // 'effect' | 'font' | 'position' | 'effect-detail' | null
 
     useEffect(() => {
         let active = true;
@@ -46,6 +46,7 @@ export default function EditorStep({ data, updateOption, updateTitle, onPrev }) 
                     textY: data.options.textY,
                     rotation: data.options.rotation,
                     textEffect: data.options.textEffect,
+                    effectConfigs: data.options.effectConfigs,
                     invert: data.options.invert,
                     width: 1080,
                     height: 1080
@@ -83,6 +84,15 @@ export default function EditorStep({ data, updateOption, updateTitle, onPrev }) 
         updateOption('textY', newY);
     };
 
+    const updateEffectConfig = (effectId, param, value) => {
+        const currentConfigs = data.options.effectConfigs || {};
+        const effectConfig = currentConfigs[effectId] || {};
+        updateOption('effectConfigs', {
+            ...currentConfigs,
+            [effectId]: { ...effectConfig, [param]: value }
+        });
+    };
+
     // Render subsection views
     const renderSubsection = () => {
         if (activeSubsection === 'effect') {
@@ -116,8 +126,11 @@ export default function EditorStep({ data, updateOption, updateTitle, onPrev }) 
                             <button
                                 key={effect.id}
                                 onClick={() => {
-                                    updateOption('textEffect', effect.id);
-                                    setActiveSubsection(null);
+                                    if (data.options.textEffect === effect.id) {
+                                        setActiveSubsection('effect-detail');
+                                    } else {
+                                        updateOption('textEffect', effect.id);
+                                    }
                                 }}
                                 style={{
                                     padding: '1.5rem',
@@ -131,13 +144,218 @@ export default function EditorStep({ data, updateOption, updateTitle, onPrev }) 
                                     display: 'flex',
                                     flexDirection: 'column',
                                     alignItems: 'center',
-                                    gap: '0.5rem'
+                                    gap: '0.5rem',
+                                    position: 'relative'
                                 }}
                             >
                                 <span style={{ fontSize: '2rem' }}>{effect.icon}</span>
                                 <span>{effect.label}</span>
+                                {data.options.textEffect === effect.id && (
+                                    <span style={{
+                                        position: 'absolute',
+                                        top: '8px',
+                                        right: '8px',
+                                        fontSize: '0.7rem',
+                                        background: 'rgba(255,255,255,0.2)',
+                                        padding: '2px 6px',
+                                        borderRadius: '4px'
+                                    }}>Tap to Edit</span>
+                                )}
                             </button>
                         ))}
+                    </div>
+                </div>
+            );
+        }
+
+        if (activeSubsection === 'effect-detail') {
+            const effectId = data.options.textEffect;
+            const effect = TEXT_EFFECTS.find(e => e.id === effectId);
+            const config = data.options.effectConfigs?.[effectId] || {};
+
+            const renderParams = () => {
+                switch (effectId) {
+                    case 'classic':
+                        return (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.5rem' }}>Outline Thickness</label>
+                                    <input
+                                        type="range" min="0" max="0.2" step="0.01"
+                                        value={config.thickness ?? 0.06}
+                                        onChange={(e) => updateEffectConfig(effectId, 'thickness', parseFloat(e.target.value))}
+                                        style={{ width: '100%', accentColor: data.color }}
+                                    />
+                                </div>
+                            </div>
+                        );
+                    case 'metallic':
+                        return (
+                            <div>
+                                <label style={{ display: 'block', fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.5rem' }}>Intensity</label>
+                                <input
+                                    type="range" min="0.05" max="0.3" step="0.01"
+                                    value={config.intensity ?? 0.15}
+                                    onChange={(e) => updateEffectConfig(effectId, 'intensity', parseFloat(e.target.value))}
+                                    style={{ width: '100%', accentColor: data.color }}
+                                />
+                            </div>
+                        );
+                    case 'neon':
+                        return (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.5rem' }}>Glow Blur</label>
+                                    <input
+                                        type="range" min="0.1" max="0.6" step="0.01"
+                                        value={config.blur ?? 0.3}
+                                        onChange={(e) => updateEffectConfig(effectId, 'blur', parseFloat(e.target.value))}
+                                        style={{ width: '100%', accentColor: data.color }}
+                                    />
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.5rem' }}>Inner Stroke</label>
+                                    <input
+                                        type="range" min="0" max="0.1" step="0.01"
+                                        value={config.inner ?? 0.03}
+                                        onChange={(e) => updateEffectConfig(effectId, 'inner', parseFloat(e.target.value))}
+                                        style={{ width: '100%', accentColor: data.color }}
+                                    />
+                                </div>
+                            </div>
+                        );
+                    case 'shadow':
+                        return (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.5rem' }}>Offset</label>
+                                    <input
+                                        type="range" min="0" max="0.15" step="0.01"
+                                        value={config.offset ?? 0.05}
+                                        onChange={(e) => updateEffectConfig(effectId, 'offset', parseFloat(e.target.value))}
+                                        style={{ width: '100%', accentColor: data.color }}
+                                    />
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.5rem' }}>Blur</label>
+                                    <input
+                                        type="range" min="0" max="0.1" step="0.01"
+                                        value={config.blur ?? 0.02}
+                                        onChange={(e) => updateEffectConfig(effectId, 'blur', parseFloat(e.target.value))}
+                                        style={{ width: '100%', accentColor: data.color }}
+                                    />
+                                </div>
+                            </div>
+                        );
+                    case 'retro3d':
+                        return (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.5rem' }}>Layers</label>
+                                    <input
+                                        type="range" min="1" max="30" step="1"
+                                        value={config.layers ?? 12}
+                                        onChange={(e) => updateEffectConfig(effectId, 'layers', parseInt(e.target.value))}
+                                        style={{ width: '100%', accentColor: data.color }}
+                                    />
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.5rem' }}>Spacing</label>
+                                    <input
+                                        type="range" min="0.005" max="0.04" step="0.001"
+                                        value={config.offset ?? 0.015}
+                                        onChange={(e) => updateEffectConfig(effectId, 'offset', parseFloat(e.target.value))}
+                                        style={{ width: '100%', accentColor: data.color }}
+                                    />
+                                </div>
+                            </div>
+                        );
+                    case 'echo':
+                        return (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.5rem' }}>Echos</label>
+                                    <input
+                                        type="range" min="2" max="15" step="1"
+                                        value={config.steps ?? 6}
+                                        onChange={(e) => updateEffectConfig(effectId, 'steps', parseInt(e.target.value))}
+                                        style={{ width: '100%', accentColor: data.color }}
+                                    />
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.5rem' }}>Motion</label>
+                                    <input
+                                        type="range" min="0.005" max="0.04" step="0.001"
+                                        value={config.offset ?? 0.015}
+                                        onChange={(e) => updateEffectConfig(effectId, 'offset', parseFloat(e.target.value))}
+                                        style={{ width: '100%', accentColor: data.color }}
+                                    />
+                                </div>
+                            </div>
+                        );
+                    case 'glow':
+                        return (
+                            <div>
+                                <label style={{ display: 'block', fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.5rem' }}>Glow Radius</label>
+                                <input
+                                    type="range" min="0.1" max="0.8" step="0.01"
+                                    value={config.radius ?? 0.4}
+                                    onChange={(e) => updateEffectConfig(effectId, 'radius', parseFloat(e.target.value))}
+                                    style={{ width: '100%', accentColor: data.color }}
+                                />
+                            </div>
+                        );
+                    case 'gradient':
+                        return (
+                            <div>
+                                <label style={{ display: 'block', fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.5rem' }}>Highlight strength</label>
+                                <input
+                                    type="range" min="0.1" max="1.0" step="0.05"
+                                    value={config.strength ?? 0.55}
+                                    onChange={(e) => updateEffectConfig(effectId, 'strength', parseFloat(e.target.value))}
+                                    style={{ width: '100%', accentColor: data.color }}
+                                />
+                            </div>
+                        );
+                    case 'outline':
+                        return (
+                            <div>
+                                <label style={{ display: 'block', fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.5rem' }}>Thickness</label>
+                                <input
+                                    type="range" min="0.01" max="0.15" step="0.005"
+                                    value={config.thickness ?? 0.05}
+                                    onChange={(e) => updateEffectConfig(effectId, 'thickness', parseFloat(e.target.value))}
+                                    style={{ width: '100%', accentColor: data.color }}
+                                />
+                            </div>
+                        );
+                    default:
+                        return <p>No specific parameters for this effect.</p>;
+                }
+            };
+
+            return (
+                <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', height: '100%' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
+                        <button
+                            onClick={() => setActiveSubsection('effect')}
+                            style={{
+                                padding: '0.6rem 1rem',
+                                borderRadius: '8px',
+                                background: '#f0f0f0',
+                                border: 'none',
+                                fontWeight: 'bold',
+                                cursor: 'pointer',
+                                fontSize: '0.9rem'
+                            }}
+                        >
+                            ← Back
+                        </button>
+                        <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 'bold' }}>Customize {effect.label}</h2>
+                    </div>
+
+                    <div style={{ flex: 1 }}>
+                        {renderParams()}
                     </div>
                 </div>
             );

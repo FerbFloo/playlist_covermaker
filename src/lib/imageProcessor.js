@@ -141,7 +141,7 @@ function drawHalftoneLayer(ctx, img, { width, height, color, contrast, brightnes
     }
 }
 
-function drawTextLayer(ctx, title, { width, height, font, textSize, color, textX, textY, textEffect }) {
+function drawTextLayer(ctx, title, { width, height, font, textSize, color, textX, textY, textEffect, effectConfigs }) {
     ctx.save();
 
     // Convert 0-1 coordinates to pixel positions
@@ -167,11 +167,13 @@ function drawTextLayer(ctx, title, { width, height, font, textSize, color, textX
         iterations++;
     }
 
+    const config = effectConfigs?.[textEffect] || {};
+
     // Apply text effect
     switch (textEffect) {
-        case 'classic':
-            // White outline + color fill (original)
-            ctx.lineWidth = baseSize * 0.06;
+        case 'classic': {
+            const thickness = config.thickness ?? 0.06;
+            ctx.lineWidth = baseSize * thickness;
             ctx.strokeStyle = '#FFFFFF';
             ctx.lineJoin = 'round';
             ctx.miterLimit = 3;
@@ -179,16 +181,17 @@ function drawTextLayer(ctx, title, { width, height, font, textSize, color, textX
             ctx.fillStyle = color;
             ctx.fillText(title, 0, 0);
             break;
+        }
 
-        case 'metallic':
-            // 3D Metallic Effect
+        case 'metallic': {
+            const intensity = config.intensity ?? 0.15;
             ctx.shadowColor = 'rgba(255, 255, 255, 0.4)';
-            ctx.shadowBlur = baseSize * 0.15;
+            ctx.shadowBlur = baseSize * intensity;
             ctx.fillStyle = '#ffffff';
             ctx.fillText(title, 0, 0);
             ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
-            ctx.shadowOffsetX = baseSize * 0.04;
-            ctx.shadowOffsetY = baseSize * 0.04;
+            ctx.shadowOffsetX = baseSize * (intensity * 0.26);
+            ctx.shadowOffsetY = baseSize * (intensity * 0.26);
             ctx.fillStyle = '#1a1a1a';
             ctx.fillText(title, 0, 0);
             ctx.shadowColor = 'transparent';
@@ -203,48 +206,55 @@ function drawTextLayer(ctx, title, { width, height, font, textSize, color, textX
             ctx.fillStyle = metalGradient;
             ctx.fillText(title, 0, 0);
             break;
+        }
 
-        case 'neon':
-            // Neon glow effect
+        case 'neon': {
+            const blur = config.blur ?? 0.3;
+            const inner = config.inner ?? 0.03;
             ctx.shadowColor = color;
-            ctx.shadowBlur = baseSize * 0.15;
-            ctx.lineWidth = baseSize * 0.03;
+            ctx.shadowBlur = baseSize * (blur * 0.5);
+            ctx.lineWidth = baseSize * inner;
             ctx.strokeStyle = color;
             ctx.strokeText(title, 0, 0);
-            ctx.shadowBlur = baseSize * 0.3;
+            ctx.shadowBlur = baseSize * blur;
             ctx.strokeText(title, 0, 0);
             ctx.shadowBlur = 0;
             ctx.fillStyle = '#FFFFFF';
             ctx.fillText(title, 0, 0);
             break;
+        }
 
-        case 'echo':
-            // Echo / Motion Blur Effect
-            const echoSteps = 6;
-            const echoOffset = baseSize * 0.015;
-            for (let i = echoSteps; i > 0; i--) {
-                ctx.fillStyle = `${color}${Math.floor((1 - i / echoSteps) * 40).toString(16).padStart(2, '0')}`;
-                ctx.fillText(title, i * echoOffset, i * echoOffset);
+        case 'echo': {
+            const steps = config.steps ?? 6;
+            const offset = config.offset ?? 0.015;
+            for (let i = steps; i > 0; i--) {
+                ctx.fillStyle = `${color}${Math.floor((1 - i / steps) * 40).toString(16).padStart(2, '0')}`;
+                ctx.fillText(title, i * (baseSize * offset), i * (baseSize * offset));
             }
             ctx.fillStyle = '#ffffff';
             ctx.fillText(title, 0, 0);
             break;
+        }
 
-        case 'glow':
-            // Soft Aura/Glow effect
+        case 'glow': {
+            const radius = config.radius ?? 0.4;
             ctx.shadowColor = color;
-            ctx.shadowBlur = baseSize * 0.4;
+            ctx.shadowBlur = baseSize * radius;
             ctx.fillStyle = '#ffffff';
             ctx.fillText(title, 0, 0);
-            ctx.shadowBlur = baseSize * 0.1;
+            ctx.shadowBlur = baseSize * (radius * 0.25);
             ctx.fillText(title, 0, 0);
             break;
+        }
 
-        case 'shadow':
-            // Bold drop shadow
-            const shadowOffset = baseSize * 0.05;
-            ctx.fillStyle = 'rgba(0,0,0,0.5)';
+        case 'shadow': {
+            const offset = config.offset ?? 0.05;
+            const blur = config.blur ?? 0.02;
+            const shadowOffset = baseSize * offset;
+            ctx.shadowColor = 'rgba(0,0,0,0.5)';
+            ctx.shadowBlur = baseSize * blur;
             ctx.fillText(title, shadowOffset, shadowOffset);
+            ctx.shadowBlur = 0;
             ctx.lineWidth = baseSize * 0.04;
             ctx.strokeStyle = '#FFFFFF';
             ctx.lineJoin = 'round';
@@ -252,11 +262,12 @@ function drawTextLayer(ctx, title, { width, height, font, textSize, color, textX
             ctx.fillStyle = color;
             ctx.fillText(title, 0, 0);
             break;
+        }
 
-        case 'retro3d':
-            // Retro 3D layered effect
-            const offset3d = baseSize * 0.015;
-            const layers = 12;
+        case 'retro3d': {
+            const layers = config.layers ?? 12;
+            const offset = config.offset ?? 0.015;
+            const offset3d = baseSize * offset;
             ctx.shadowBlur = baseSize * 0.02;
             for (let i = layers; i > 0; i--) {
                 const alpha = 0.25 - (i / layers) * 0.15;
@@ -272,29 +283,32 @@ function drawTextLayer(ctx, title, { width, height, font, textSize, color, textX
             ctx.fillStyle = color;
             ctx.fillText(title, 0, 0);
             break;
+        }
 
-        case 'outline':
-            // Outline only
-            ctx.lineWidth = baseSize * 0.05;
+        case 'outline': {
+            const thickness = config.thickness ?? 0.05;
+            ctx.lineWidth = baseSize * thickness;
             ctx.strokeStyle = color;
             ctx.lineJoin = 'round';
             ctx.miterLimit = 3;
             ctx.strokeText(title, 0, 0);
             break;
+        }
 
-        case 'gradient':
-            // Solid color top, subtly lighter bottom
+        case 'gradient': {
+            const strength = config.strength ?? 0.55;
             ctx.fillStyle = color;
             ctx.fillText(title, 0, 0);
 
             ctx.globalCompositeOperation = 'source-atop';
             const grad = ctx.createLinearGradient(0, -baseSize / 2, 0, baseSize / 2);
             grad.addColorStop(0, 'rgba(255, 255, 255, 0)');
-            grad.addColorStop(1, 'rgba(255, 255, 255, 0.55)');
+            grad.addColorStop(1, `rgba(255, 255, 255, ${strength})`);
             ctx.fillStyle = grad;
             ctx.fillText(title, 0, 0);
             ctx.globalCompositeOperation = 'source-over';
             break;
+        }
 
         default:
             // Fallback to classic
